@@ -1,0 +1,360 @@
+--------The Emperor-----
+
+--Another script I modified because yes.
+
+--Based on the Stand of Hol Horse from Part 3 of JJBA.
+
+wait(1) --For running in rbx studio
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Tescalus/Pendulum-Hubs-Source/main/Reanimation.lua"))()
+warn("Netless Activated!")
+loadstring(game:GetObjects("rbxassetid://5425999987")[1].Source)()
+mee = game.Players.LocalPlayer
+pistol = Instance.new("Tool", mee.Backpack)
+pistol.GripForward = Vector3.new(-0.149, 0.984, -0.099)
+pistol.GripPos = Vector3.new(0.1, -0.18, 0.8)
+pistol.GripRight = Vector3.new(0.989, 1, 0.015)
+pistol.GripUp = Vector3.new(0, 35, 0.1)
+pistol.ToolTip = "Gun wielder, woman respecter."
+pistol.Name = "The Emperor"
+pistolpart = Instance.new("Part", pistol)
+pistolpart.Name = "Handle"
+pistolpart.BrickColor = BrickColor.new("Black")
+pistolpart.Material = "SmoothPlastic"
+pistolpart.Orientation = Vector3.new(-88.99, 152.78, 135.7)
+pistolpart.Size = Vector3.new(0.556, 1.318, 2.013)
+pistolmesh = Instance.new("SpecialMesh", pistolpart)
+pistolmesh.MeshId = "rbxassetid://4183097171"
+pistolmesh.Scale = Vector3.new(.1, .1, .1)
+pistolmesh.TextureId = "rbxassetid://4183097344"
+pistolmesh.VertexColor = Vector3.new(2, 2, 2)
+gunshotsound = Instance.new("Sound", pistolpart)
+gunshotsound.SoundId = "rbxassetid://3909415454"
+mouserotatecharacter = true
+ 
+ 
+pistol.Equipped:connect(function(mouse)
+mouserotatecharacter = true
+local torso = mee.Character.HumanoidRootPart 
+local mouseturning = mee:GetMouse()
+mee.Character.Humanoid.AutoRotate = false
+mouseturning.Move:connect(function()
+if mouserotatecharacter == true then
+  torso.CFrame = CFrame.new(torso.Position, mouseturning.Hit.p*Vector3.new(1,0,1) + torso.Position*Vector3.new(0, 1, 0))
+ 
+end
+end)
+mouse.Button1Down:connect(function()
+gunshotsound:Play()
+local ray = Ray.new(pistol.Handle.CFrame.p, (mouse.Hit.p - pistol.Handle.CFrame.p).unit * 300)
+local part, position = workspace:FindPartOnRay(ray, mee.Character, false, true)
+ 
+local beam = Instance.new("Part", workspace)
+beam.BrickColor = BrickColor.new("Magenta")
+beam.FormFactor = "Custom"
+beam.Material = "Neon"
+beam.Transparency = 0
+beam.Anchored = true
+beam.Locked = true
+beam.CanCollide = false
+ 
+local distance = (pistol.Handle.CFrame.p - position).magnitude
+beam.Size = Vector3.new(0.3, 0.3, distance)
+beam.CFrame = CFrame.new(pistol.Handle.CFrame.p, position) * CFrame.new(0, 0, -distance / 2)
+ 
+game:GetService("Debris"):AddItem(beam, 0.1)
+ 
+if part then
+local humanoid = part.Parent:FindFirstChild("Humanoid")
+ 
+if not humanoid then
+humanoid = part.Parent.Parent:FindFirstChild("Humanoid")
+end
+ 
+if humanoid then
+plrmodel = humanoid.Parent
+if plrmodel.Humanoid.Health ~= 0 then
+--blood
+plrmodel.Archivable = true
+local Char = plrmodel
+local Hum = Char:FindFirstChild("Humanoid")
+local Tor = Char:FindFirstChild("Torso") or Char:FindFirstChild("UpperTorso")
+local Health = Hum.Health
+ 
+local M = math.random
+local R = math.rad
+local rates = {.05, .075, .1, .15}
+ 
+local smooth = function(P)
+local SM = Enum.SurfaceType.SmoothNoOutlines
+P.TopSurface = SM
+P.BottomSurface = SM
+P.RightSurface = SM
+P.LeftSurface = SM
+P.FrontSurface = SM
+P.BackSurface = SM 
+end
+ 
+local function BloodPool(Part,Size)
+local Pool = Instance.new("Part",game.Workspace)
+Pool.TopSurface = 0
+Pool.CanCollide = false
+Pool.BrickColor = BrickColor.new("Crimson")
+Pool.Transparency = 0
+Instance.new("CylinderMesh",Pool)
+Pool.Anchored = true
+Pool.Name = "BloodPoolPart"
+smooth(Pool)
+Pool.FormFactor = Enum.FormFactor.Custom
+Pool.Size = Size
+local c = Part.CFrame*CFrame.new(M(-3.01,3.01),-2.9,M(-3.01,3.01)) 
+coroutine.resume(coroutine.create(function()
+local rate = rates[M(1,#rates)]
+game.Debris:AddItem(Pool,15)
+for i = 1,M(25,70) do
+wait()
+Pool.CFrame = c
+Pool.Size = Pool.Size+Vector3.new(rate,0,rate)
+end 
+wait(5)
+Pool:Destroy()
+end)) 
+end
+ 
+local function BloodDrops(Size,Area)
+local Blood = Instance.new("Part",game.Workspace)
+Blood.BrickColor = BrickColor.new("Crimson")
+Blood.Parent = plrmodel
+Blood.TopSurface = 0
+Blood.CanCollide = false
+Blood.Anchored = false
+Blood.FormFactor = Enum.FormFactor.Custom
+Blood.Size = Size
+Blood.CFrame = Area*CFrame.new(M(-1.00,1.00),M(-1.00,1.00),M(-1.00,1.00)) 
+return Blood
+end
+ 
+ 
+ 
+Hum.Changed:connect(function()
+if Hum.Health < Health then
+ 
+Health = Hum.Health 
+for i = 1, math.random(4,10)do
+local Size = Vector3.new(M(-0.25,0.25),.2,M(-.25,.25))
+local Blood = BloodDrops(Size,Tor.CFrame) 
+local Stopper = false
+local Size2 = Vector3.new(M(-0.25,0.25),.2,M(-.25,.25))
+BloodPool(Tor,Size2) 
+end 
+end
+end)
+end
+--Ragdoll
+wait()
+function getAttachment0(attachmentName)
+for _,child in next,plrmodel:GetChildren() do
+local attachment = child:FindFirstChild(attachmentName)
+if attachment then
+return attachment
+end
+end
+end
+plrmodel.Humanoid.Died:Connect(function(var)
+local removeHRP = true
+local head = plrmodel["Head"]
+local leftarm = plrmodel["Left Arm"]
+local leftleg = plrmodel["Left Leg"]
+local rightleg = plrmodel["Right Leg"]
+local rightarm = plrmodel["Right Arm"]
+local torso = plrmodel.Torso
+local root = plrmodel.HumanoidRootPart
+if removeHRP == true then
+root:Destroy()
+end
+local rootA =Instance.new("Attachment")
+local HeadA = Instance.new("Attachment")
+local LeftArmA = Instance.new("Attachment")
+local LeftLegA = Instance.new("Attachment")
+local RightArmA = Instance.new("Attachment")
+local RightLegA = Instance.new("Attachment")
+local TorsoA = Instance.new("Attachment")
+local TorsoA1 = Instance.new("Attachment")
+local TorsoA2 = Instance.new("Attachment")
+local TorsoA3 = Instance.new("Attachment")
+local TorsoA4 = Instance.new("Attachment")
+local TorsoA5 = Instance.new("Attachment")
+local function set1()
+HeadA.Name = "HeadA"
+HeadA.Parent = head
+HeadA.Position = Vector3.new(0, -0.5, 0)
+HeadA.Rotation = Vector3.new(0, 0, 0)
+HeadA.Axis = Vector3.new(1, 0, 0)
+HeadA.SecondaryAxis = Vector3.new(0, 1, 0)
+LeftArmA.Name = "LeftArmA"
+LeftArmA.Parent = leftarm
+LeftArmA.Position = Vector3.new(0.5, 1, 0)
+LeftArmA.Rotation = Vector3.new(0, 0, 0)
+LeftArmA.Axis = Vector3.new(1, 0, 0)
+LeftArmA.SecondaryAxis = Vector3.new(0, 1, 0)
+LeftLegA.Name = "LeftLegA"
+LeftLegA.Parent = leftleg
+LeftLegA.Position = Vector3.new(0, 1, 0)
+LeftLegA.Rotation = Vector3.new(0, 0, 0)
+LeftLegA.Axis = Vector3.new(1, 0, 0)
+LeftLegA.SecondaryAxis = Vector3.new(0, 1, 0)
+RightArmA.Name = "RightArmA"
+RightArmA.Parent = rightarm
+RightArmA.Position = Vector3.new(-0.5, 1, 0)
+RightArmA.Rotation = Vector3.new(0, 0, 0)
+RightArmA.Axis = Vector3.new(1, 0, 0)
+RightArmA.SecondaryAxis = Vector3.new(0, 1, 0)
+RightLegA.Name = "RightLegA"
+RightLegA.Parent = rightleg
+RightLegA.Position = Vector3.new(0, 1, 0)
+RightLegA.Rotation = Vector3.new(0, 0, 0)
+RightLegA.Axis = Vector3.new(1, 0, 0)
+RightLegA.SecondaryAxis = Vector3.new(0, 1, 0)
+rootA.Name= "rootA"
+rootA.Parent = root
+rootA.Position = Vector3.new(0, 0, 0)
+rootA.Rotation = Vector3.new(0, 90, 0)
+rootA.Axis = Vector3.new(0, 0, -1)
+rootA.SecondaryAxis = Vector3.new(0, 1, 0)
+end
+local function set2()
+TorsoA.Name = "TorsoA"
+TorsoA.Parent = torso
+TorsoA.Position = Vector3.new(0.5, -1, 0)
+TorsoA.Rotation = Vector3.new(0, 0, 0)
+TorsoA.Axis = Vector3.new(1, 0, 0)
+TorsoA.SecondaryAxis = Vector3.new(0, 1, 0)
+TorsoA1.Name = "TorsoA1"
+TorsoA1.Parent = torso
+TorsoA1.Position = Vector3.new(-0.5, -1, 0)
+TorsoA1.Rotation = Vector3.new(0, 0, 0)
+TorsoA1.Axis = Vector3.new(1, 0, 0)
+TorsoA1.SecondaryAxis = Vector3.new(0, 1, 0)
+TorsoA2.Name = "TorsoA2"
+TorsoA2.Parent = torso
+TorsoA2.Position = Vector3.new(-1, 1, 0)
+TorsoA2.Rotation = Vector3.new(0, 0, 0)
+TorsoA2.Axis = Vector3.new(1, 0, 0)
+TorsoA2.SecondaryAxis = Vector3.new(0, 1, 0)
+TorsoA3.Name = "TorsoA3"
+TorsoA3.Parent = torso
+TorsoA3.Position = Vector3.new(1, 1, 0)
+TorsoA3.Rotation = Vector3.new(0, 0, 0)
+TorsoA3.Axis = Vector3.new(1, 0, 0)
+TorsoA3.SecondaryAxis = Vector3.new(0, 1, 0)
+TorsoA4.Name = "TorsoA4"
+TorsoA4.Parent = torso
+TorsoA4.Position = Vector3.new(0, 1, 0)
+TorsoA4.Rotation = Vector3.new(0, 0, 0)
+TorsoA4.Axis = Vector3.new(1, 0, 0)
+TorsoA4.SecondaryAxis = Vector3.new(0, 1, 0)
+TorsoA5.Name = "TorsoA5"
+TorsoA5.Parent = torso
+TorsoA5.Position = Vector3.new(0, 0, 0)
+TorsoA5.Rotation = Vector3.new(0, 90, 0)
+TorsoA5.Axis = Vector3.new(0, 0, -1)
+TorsoA5.SecondaryAxis = Vector3.new(0, 1, 0)
+end
+local function set3()
+end
+spawn(set1);
+spawn(set2);
+local HA = Instance.new("HingeConstraint")
+HA.Parent = head
+HA.Attachment0 = HeadA
+HA.Attachment1 = TorsoA4
+HA.Enabled = true
+HA.LimitsEnabled=true
+HA.LowerAngle=0
+HA.UpperAngle=0
+local LAT = Instance.new("BallSocketConstraint")
+LAT.Parent = leftarm
+LAT.Attachment0 = LeftArmA
+LAT.Attachment1 = TorsoA2
+LAT.Enabled = true
+LAT.LimitsEnabled=true
+LAT.UpperAngle=90
+local RAT = Instance.new("BallSocketConstraint")
+RAT.Parent = rightarm
+RAT.Attachment0 = RightArmA
+RAT.Attachment1 = TorsoA3
+RAT.Enabled = true
+RAT.LimitsEnabled=true
+RAT.UpperAngle=90
+local HA = Instance.new("BallSocketConstraint")
+HA.Parent = head
+HA.Attachment0 = HeadA
+HA.Attachment1 = TorsoA4
+HA.Enabled = true
+local TLL = Instance.new("BallSocketConstraint")
+TLL.Parent = torso
+TLL.Attachment0 = TorsoA1
+TLL.Attachment1 = LeftLegA
+TLL.Enabled = true
+TLL.LimitsEnabled=true
+TLL.UpperAngle=90
+local TRL = Instance.new("BallSocketConstraint")
+TRL.Parent = torso
+TRL.Attachment0 = TorsoA
+TRL.Attachment1 = RightLegA
+TRL.Enabled = true
+TRL.LimitsEnabled=true
+TRL.UpperAngle=90
+local RTA = Instance.new("BallSocketConstraint")
+RTA.Parent = root
+RTA.Attachment0 = rootA
+RTA.Attachment1 = TorsoA5
+RTA.Enabled = true
+RTA.LimitsEnabled=true
+RTA.UpperAngle=0
+head.Velocity = head.CFrame.lookVector*30
+ 
+for _,child in next,plrmodel:GetChildren() do
+if child:IsA("Accoutrement") then
+for _,part in next,child:GetChildren() do
+if part:IsA("BasePart") then
+part.Parent = plrmodel
+child:remove()
+local attachment1 = part:FindFirstChildOfClass("Attachment")
+local attachment0 = getAttachment0(attachment1.Name)
+if attachment0 and attachment1 then
+local constraint = Instance.new("HingeConstraint")
+constraint.Attachment0 = attachment0
+constraint.Attachment1 = attachment1
+constraint.LimitsEnabled = true
+constraint.UpperAngle = 0
+constraint.LowerAngle = 0
+constraint.Parent = plrmodel
+end
+end
+end
+end
+end
+end)
+ 
+end
+if humanoid.Health ~= 0 then
+humanoid.Health = 0
+wait(3)
+while true do
+if humanoid.Health ~= 0 then
+humanoid.Health = 0 --This loop is a strange kill system I know, but this prevents doing 99 damage instead of 100 for some reason.s
+else
+break
+end
+wait(0.3)
+end
+end
+end
+end)
+end)
+ 
+pistol.Unequipped:connect(function()
+wait(0.2)
+mouserotatecharacter = false
+  mee.Character.Humanoid.AutoRotate = true
+end)
